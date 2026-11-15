@@ -23,6 +23,11 @@ input,textarea{width:100%;font:inherit;color:var(--text);background:var(--bg);bo
 input:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
 .row{display:flex;gap:10px}.row>div{flex:1}
 small{color:var(--muted);font-weight:400}
+fieldset{border:0;margin:14px 0 0;padding:0;min-width:0}
+legend{font-weight:600;font-size:.95rem;padding:0;margin-bottom:6px}
+.opts{display:flex;gap:10px}
+.opt{flex:1;display:flex;align-items:center;gap:8px;margin:0;font-weight:600;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer}
+.opt input{width:auto;margin:0;accent-color:var(--accent)}
 button{width:100%;margin-top:20px;padding:14px;font:inherit;font-weight:700;font-size:1.05rem;border:0;border-radius:10px;background:var(--accent);color:var(--accent-text);cursor:pointer}
 #err{color:var(--err);margin:12px 0 0;min-height:1.2em;font-size:.9rem}
 .foot{color:var(--muted);font-size:.85rem;text-align:center;margin-top:14px}
@@ -50,6 +55,13 @@ button{width:100%;margin-top:20px;padding:14px;font:inherit;font-weight:700;font
 </div>
 <label for="notes">Allergies, special needs, pets, anything else <small>(optional)</small></label>
 <textarea id="notes" rows="3"></textarea>
+<fieldset>
+<legend>Consent to post child(ren)’s photos on social media (faces covered)</legend>
+<div class="opts">
+<label class="opt"><input type="radio" name="consent" value="Yes, I consent" required> Yes, I consent</label>
+<label class="opt"><input type="radio" name="consent" value="No, I do not consent" required> No, I do not consent</label>
+</div>
+</fieldset>
 <p id="err" role="alert"></p>
 <button type="submit">Send request on WhatsApp</button>
 </form>
@@ -65,6 +77,8 @@ f.addEventListener("submit",function(e){
 e.preventDefault();
 var req=["name","num","ages","area","date","start","end"];
 for(var i=0;i<req.length;i++){if(!v(req[i])){err.textContent="Please fill in all required fields.";document.getElementById(req[i]).focus();return}}
+var cs=document.querySelector('input[name="consent"]:checked');
+if(!cs){err.textContent="Please select one of the photo consent options before submitting.";document.querySelector('input[name="consent"]').focus();return}
 err.textContent="";
 var ds=new Date(v("date")+"T00:00").toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
 var m="Hi! I'd like to request a babysitting booking.\n\n"+
@@ -74,6 +88,7 @@ var m="Hi! I'd like to request a babysitting booking.\n\n"+
 "Area: "+v("area")+"\n"+
 "Date: "+ds+"\n"+
 "Time: "+v("start")+" to "+v("end")+"\n"+
+"Photo consent (faces covered): "+cs.value+"\n"+
 "Notes: "+(v("notes")||"None");
 var url="https://wa.me/"+PHONE+"?text="+encodeURIComponent(m);
 var w=window.open(url,"_blank");
